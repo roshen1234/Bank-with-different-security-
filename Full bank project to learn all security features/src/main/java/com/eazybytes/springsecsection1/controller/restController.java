@@ -10,6 +10,6 @@ public class restController {
     @GetMapping("/")
     public String showDetails()
     {
-        return "HELLO WORLD";
+        return "Welcome to the world of Spring Security";
     }
 }

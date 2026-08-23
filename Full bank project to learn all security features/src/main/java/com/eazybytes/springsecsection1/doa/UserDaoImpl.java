@@ -1,8 +1,10 @@
 package com.eazybytes.springsecsection1.doa;
 
+import com.eazybytes.springsecsection1.DTO.WebUser;
 import com.eazybytes.springsecsection1.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -28,6 +30,14 @@ public class UserDaoImpl implements UserDAO{
         }
 
         return theUser;
+    }
+
+
+    @Override
+    @Transactional
+    public User save(User user) {
+        return entityManager.merge(user);
+
     }
 
 }

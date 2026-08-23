@@ -4,15 +4,19 @@ import com.eazybytes.springsecsection1.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
 import javax.sql.DataSource;
 import javax.xml.crypto.Data;
@@ -60,16 +64,32 @@ public class DemoSecurityConfig {
 //        return new JdbcUserDetailsManager(dataSource);
 //    }
 
+//    @Bean
+//    public BCryptPasswordEncoder passwordEncoder()
+//    {
+//        return new BCryptPasswordEncoder();
+//    }
+
+    //we can use above code but maybe in future instead of bCrypt some other can come so if we use the below code it will always select the latest best one.But if we use this we have to mention in the password what we use like {bcrypt}{noop} etc
     @Bean
-    public BCryptPasswordEncoder passwordEncoder()
+    public PasswordEncoder passwordEncoder()
     {
-        return new BCryptPasswordEncoder();
+
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    //this is to check if the password is good ot not the entered password if not they will need to select another password
+    @Bean
+    public CompromisedPasswordChecker compromisedPasswordChecker(){
+        return new HaveIBeenPwnedRestApiPasswordChecker();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserService userService,BCryptPasswordEncoder passwordEncoder) {
+    public DaoAuthenticationProvider authenticationProvider(UserService userService,PasswordEncoder passwordEncoder,CompromisedPasswordChecker compromisedPasswordChecker) {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider(userService);
         auth.setPasswordEncoder(passwordEncoder);
+        //id we want to use CompromisedPasswordChecker if we use oob DaoAuthenticationProvider it already has this line
+//        auth.setCompromisedPasswordChecker(compromisedPasswordChecker);
         return auth;
     }
 
@@ -80,6 +100,8 @@ public class DemoSecurityConfig {
         httpSecurity.authorizeHttpRequests(configure->
                 configure.requestMatchers("/").hasRole("ADMIN")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
+                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards").authenticated()
+                        .requestMatchers("/notices","/contact","/error","/register").permitAll()
         );
 
         httpSecurity.httpBasic(Customizer.withDefaults());

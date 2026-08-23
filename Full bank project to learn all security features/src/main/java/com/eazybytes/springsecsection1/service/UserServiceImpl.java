@@ -1,5 +1,6 @@
 package com.eazybytes.springsecsection1.service;
 
+import com.eazybytes.springsecsection1.DTO.WebUser;
 import com.eazybytes.springsecsection1.doa.RoleDOA;
 import com.eazybytes.springsecsection1.doa.UserDAO;
 import com.eazybytes.springsecsection1.entity.Role;
@@ -8,8 +9,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -18,11 +21,13 @@ public class UserServiceImpl implements UserService{
 
     UserDAO userDAO;
     RoleDOA roleDOA;
+    PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserDAO userDAO, RoleDOA roleDOA)
+    public UserServiceImpl(UserDAO userDAO, RoleDOA roleDOA,PasswordEncoder passwordEncoder)
     {
         this.userDAO=userDAO;
         this.roleDOA=roleDOA;
+        this.passwordEncoder=passwordEncoder;
     }
 
     @Override
@@ -41,4 +46,28 @@ public class UserServiceImpl implements UserService{
     {
        return  roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
+
+    @Override
+    public int save(WebUser user) {
+        User finalUser=new User();
+        finalUser.setUserName(user.getUserName());
+        finalUser.setEmail(user.getEmail());
+        finalUser.setFirstName(user.getFirstName());
+        finalUser.setLastName(user.getLastName());
+        finalUser.setEnabled(true);
+
+        finalUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        finalUser.setRoles(Arrays.asList(roleDOA.findRoleByName("ROLE_EMPLOYEE")));
+
+        User theUser=userDAO.save(finalUser);
+
+        return theUser.getId();
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userDAO.findUserByUsername(username);
+    }
+
+
 }

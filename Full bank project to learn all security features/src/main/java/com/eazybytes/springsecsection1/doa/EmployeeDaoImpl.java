@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class EmployeeDaoImpl implements  EmployeeDOA{
+public class EmployeeDaoImpl implements EmployeeDOA {
 
     EntityManager entityManager;
 
@@ -19,7 +19,7 @@ public class EmployeeDaoImpl implements  EmployeeDOA{
 
     @Override
     public List<Employee> findAll() {
-        TypedQuery<Employee> emp=entityManager.createQuery("FROM Employee",Employee.class);
+        TypedQuery<Employee> emp=entityManager.createQuery("FROM Employee", Employee.class);
         return emp.getResultList();
     }
 

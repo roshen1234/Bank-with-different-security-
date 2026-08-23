@@ -14,7 +14,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     EmployeeDaoImpl employeeDao;
     EmployeeRepository employeeRepository;
-    public EmployeeServiceImpl(EmployeeDaoImpl employeeDao,EmployeeRepository employeeRepository)
+    public EmployeeServiceImpl(EmployeeDaoImpl employeeDao, EmployeeRepository employeeRepository)
     {
 
         this.employeeDao=employeeDao;
