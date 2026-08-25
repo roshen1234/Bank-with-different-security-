@@ -1,30 +1,17 @@
 package com.eazybytes.springsecsection1.security;
 
-import com.eazybytes.springsecsection1.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
-
-import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 
 @Configuration
-@Profile("!prod")
-public class DemoSecurityConfig {
+@Profile("prod")
+public class ProdDemoSecurityConfig {
 
 //    @Bean
 //    public InMemoryUserDetailsManager userDetailsManager() {
@@ -106,6 +93,9 @@ public class DemoSecurityConfig {
                         .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register").permitAll()
         );
+
+        //this is to make every call https and not http the default port of https is 8443
+        httpSecurity.redirectToHttps(Customizer.withDefaults());
 
         httpSecurity.httpBasic(Customizer.withDefaults());
 
