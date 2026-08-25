@@ -78,20 +78,21 @@ public class DemoSecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    //this is to check if the password is good ot not the entered password if not they will need to select another password
-    @Bean
-    public CompromisedPasswordChecker compromisedPasswordChecker(){
-        return new HaveIBeenPwnedRestApiPasswordChecker();
-    }
+    //this is to check if the password is good ot not the entered password if not they will need to select another password (if we add this then in default DaoAuthenticationProvider it checks this and return result)
+//    @Bean
+//    public CompromisedPasswordChecker compromisedPasswordChecker(){
+//        return new HaveIBeenPwnedRestApiPasswordChecker();
+//    }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserService userService,PasswordEncoder passwordEncoder,CompromisedPasswordChecker compromisedPasswordChecker) {
-        DaoAuthenticationProvider auth = new DaoAuthenticationProvider(userService);
-        auth.setPasswordEncoder(passwordEncoder);
-        //id we want to use CompromisedPasswordChecker if we use oob DaoAuthenticationProvider it already has this line
-//        auth.setCompromisedPasswordChecker(compromisedPasswordChecker);
-        return auth;
-    }
+    //this is not needed as daoAuthenticationProvider is given by default so even if we dont mention it like below it will still run by default code
+//    @Bean
+//    public DaoAuthenticationProvider authenticationProvider(UserService userService,PasswordEncoder passwordEncoder,CompromisedPasswordChecker compromisedPasswordChecker) {
+//        DaoAuthenticationProvider auth = new DaoAuthenticationProvider(userService);
+//        auth.setPasswordEncoder(passwordEncoder);
+//        //id we want to use CompromisedPasswordChecker if we use oob DaoAuthenticationProvider it already has this line
+////        auth.setCompromisedPasswordChecker(compromisedPasswordChecker);
+//        return auth;
+//    }
 
 
     @Bean
