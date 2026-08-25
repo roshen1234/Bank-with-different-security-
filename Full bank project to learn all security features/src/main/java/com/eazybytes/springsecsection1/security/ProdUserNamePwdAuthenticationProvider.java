@@ -14,13 +14,14 @@ import org.springframework.stereotype.Component;
 
 //this is the custom authenticationProvider that we are creating like default DaoAuthenticationProvider that spring has given
 @Component
-@Profile("!prod")
-public class UserNamePwdAuthenticationProvider implements AuthenticationProvider {
+//because we mentioned this it runs only if profile is prod
+@Profile("prod")
+public class ProdUserNamePwdAuthenticationProvider implements AuthenticationProvider {
 
     public UserService userService;
     public PasswordEncoder passwordEncoder;
 
-    public UserNamePwdAuthenticationProvider(UserService userService,PasswordEncoder passwordEncoder)
+    public ProdUserNamePwdAuthenticationProvider(UserService userService, PasswordEncoder passwordEncoder)
     {
         this.userService=userService;
         this.passwordEncoder=passwordEncoder;
@@ -32,9 +33,15 @@ public class UserNamePwdAuthenticationProvider implements AuthenticationProvider
      String userName=authentication.getName();
      String pwd=authentication.getCredentials().toString();
      UserDetails userDetails=userService.loadUserByUsername(userName);
-         //for no prod instance we dont check password
+     if(passwordEncoder.matches(pwd,userDetails.getPassword()))
+     {
          //here we can add any cutom check like only authentiate if age >30 so all those we can add here
          return new UsernamePasswordAuthenticationToken(userName,pwd,userDetails.getAuthorities());
+     }
+     else
+     {
+         throw new BadCredentialsException("Invalid Password");
+     }
     }
 
     //this function define the type of object this custom Authentication provider accepts we need to mention here (here we mention the same type of DaoAuthenticationProvider but we can mention differnt types)
