@@ -1,5 +1,6 @@
 package com.eazybytes.springsecsection1.security;
 
+import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
 import com.eazybytes.springsecsection1.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -108,6 +109,7 @@ public class DemoSecurityConfig {
         );
 
         httpSecurity.httpBasic(Customizer.withDefaults());
+
 
 //        httpSecurity.sessionManagement(session->
 //                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

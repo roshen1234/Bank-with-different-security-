@@ -1,5 +1,6 @@
 package com.eazybytes.springsecsection1.security;
 
+import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -95,9 +96,15 @@ public class ProdDemoSecurityConfig {
         );
 
         //this is to make every call https and not http the default port of https is 8443
-        httpSecurity.redirectToHttps(Customizer.withDefaults());
+//        httpSecurity.redirectToHttps(Customizer.withDefaults());
 
-        httpSecurity.httpBasic(Customizer.withDefaults());
+        //the below line will call BasicAuthenticationEntryPoint its default given by spring
+//        httpSecurity.httpBasic(Customizer.withDefaults());
+        //the below line will tell spring to call Custom BasicAuthenticationEntryPoint instead of default BasicAuthenticationEntryPoint this is triggered when there is error when we try to login (only for basic Authentication login error it will trigger)
+        httpSecurity.httpBasic(hbc->hbc.authenticationEntryPoint((new CustomBasicAuthenticationEntryPoint())));
+
+        //httpSecurity.exceptionHandling(exception->exception.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));//If we want to mention it as global then we can mention like this but mostly we will use this for only basic authentication so above is also fine
+
 
 //        httpSecurity.sessionManagement(session->
 //                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
