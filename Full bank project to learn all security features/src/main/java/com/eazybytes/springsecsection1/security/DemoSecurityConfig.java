@@ -105,11 +105,13 @@ public class DemoSecurityConfig {
                 configure.requestMatchers("/").hasRole("ADMIN")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
                         .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards").authenticated()
-                        .requestMatchers("/notices","/contact","/error","/register").permitAll()
+                        .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
 
         httpSecurity.httpBasic(Customizer.withDefaults());
 
+        httpSecurity.formLogin(Customizer.withDefaults());
+        httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
 
 //        httpSecurity.sessionManagement(session->
 //                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -93,7 +93,7 @@ public class ProdDemoSecurityConfig {
                 configure.requestMatchers("/").hasRole("ADMIN")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
                         .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards").authenticated()
-                        .requestMatchers("/notices","/contact","/error","/register").permitAll()
+                        .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
 
         //this is to make every call https and not http the default port of https is 8443
@@ -107,6 +107,12 @@ public class ProdDemoSecurityConfig {
 
         //access denied handler we can only mention globaly not in httpBasic
         httpSecurity.exceptionHandling(exception->exception.accessDeniedHandler(new CustomAccessDeniedHandler()));
+
+        httpSecurity.formLogin(Customizer.withDefaults());
+
+        //to redirect to this page if session expires. How long session should stay before expiration is given in application property file
+        //Also we can set the limit of session we can create (by default unlimited) and also if session creation reached limit keep already active alive and reject those are going to be created
+        httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(1).maxSessionsPreventsLogin(true));
 
 //        httpSecurity.sessionManagement(session->
 //                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
