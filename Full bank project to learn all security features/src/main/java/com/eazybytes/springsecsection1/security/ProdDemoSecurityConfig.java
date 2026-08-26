@@ -1,5 +1,6 @@
 package com.eazybytes.springsecsection1.security;
 
+import com.eazybytes.springsecsection1.exception.CustomAccessDeniedHandler;
 import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -102,9 +103,10 @@ public class ProdDemoSecurityConfig {
 //        httpSecurity.httpBasic(Customizer.withDefaults());
         //the below line will tell spring to call Custom BasicAuthenticationEntryPoint instead of default BasicAuthenticationEntryPoint this is triggered when there is error when we try to login (only for basic Authentication login error it will trigger)
         httpSecurity.httpBasic(hbc->hbc.authenticationEntryPoint((new CustomBasicAuthenticationEntryPoint())));
-
         //httpSecurity.exceptionHandling(exception->exception.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));//If we want to mention it as global then we can mention like this but mostly we will use this for only basic authentication so above is also fine
 
+        //access denied handler we can only mention globaly not in httpBasic
+        httpSecurity.exceptionHandling(exception->exception.accessDeniedHandler(new CustomAccessDeniedHandler()));
 
 //        httpSecurity.sessionManagement(session->
 //                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
