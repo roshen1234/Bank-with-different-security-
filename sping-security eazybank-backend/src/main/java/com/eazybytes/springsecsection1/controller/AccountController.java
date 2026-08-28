@@ -1,15 +1,27 @@
 package com.eazybytes.springsecsection1.controller;
 
 
+import com.eazybytes.springsecsection1.doa.AccountsRepository;
+import com.eazybytes.springsecsection1.entity.Accounts;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class AccountController {
 
+    private final AccountsRepository accountsRepository;
+
     @GetMapping("/myAccount")
-    public String getAccountDetails()
-    {
-        return "Welcome to Spring Application with security";
+    public Accounts getAccountDetails(@RequestParam long id) {
+        Accounts accounts = accountsRepository.findByCustomerId(id);
+        if (accounts != null) {
+            return accounts;
+        } else {
+            return null;
+        }
     }
+
 }

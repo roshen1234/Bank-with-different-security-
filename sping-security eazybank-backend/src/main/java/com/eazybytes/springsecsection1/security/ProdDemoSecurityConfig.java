@@ -92,7 +92,7 @@ public class ProdDemoSecurityConfig {
         httpSecurity.authorizeHttpRequests(configure->
                 configure.requestMatchers("/").hasRole("ADMIN")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
-                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards").authenticated()
+                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards","/user").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
 

@@ -5,9 +5,13 @@ import com.eazybytes.springsecsection1.entity.User;
 import com.eazybytes.springsecsection1.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -48,6 +52,13 @@ public class UserController {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An Exception occurred"+exc);
         }
+    }
+
+    @GetMapping("/user")
+    public User getUserDetailsAfterLogin(Authentication authetication)
+    {
+        User user=userService.findUserByUsername(authetication.getName());
+        return user;
     }
 
 }

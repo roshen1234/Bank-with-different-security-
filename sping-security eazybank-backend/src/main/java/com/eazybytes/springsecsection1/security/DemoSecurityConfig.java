@@ -104,7 +104,7 @@ public class DemoSecurityConfig {
         httpSecurity.authorizeHttpRequests(configure->
                 configure.requestMatchers("/").hasRole("admin")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
-                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards").authenticated()
+                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards","/user").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
 
