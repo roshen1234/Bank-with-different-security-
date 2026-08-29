@@ -2,6 +2,8 @@ package com.eazybytes.springsecsection1.security;
 
 import com.eazybytes.springsecsection1.exception.CustomAccessDeniedHandler;
 import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
+import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -10,6 +12,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
 
 @Configuration
 @Profile("prod")
@@ -89,10 +95,22 @@ public class ProdDemoSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
     {
-        httpSecurity.authorizeHttpRequests(configure->
+        httpSecurity.cors(cors->cors.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public @Nullable CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration corsConfiguration=new CorsConfiguration();
+                        corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+                        corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                        corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+                        corsConfiguration.setAllowCredentials(true);
+                        corsConfiguration.setMaxAge(3600L);
+                        return corsConfiguration;
+                    }
+                }))
+                .authorizeHttpRequests(configure->
                 configure.requestMatchers("/").hasRole("ADMIN")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
-                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards","/user").authenticated()
+                        .requestMatchers("/myAccount/**","/myBalance/**","/myLoans/**","/myCards/**","/user").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
 

@@ -31,6 +31,7 @@ public class Notice {
     @Column(name = "notic_end_dt")
     private Date noticEndDt;
 
+    //this means dont add this field when json is returned like when we say return notice
     @JsonIgnore
     @Column(name = "create_dt")
     private Date createDt;

@@ -2,6 +2,8 @@ package com.eazybytes.springsecsection1.security;
 
 import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
 import com.eazybytes.springsecsection1.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -19,9 +21,13 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
 import javax.xml.crypto.Data;
+import java.util.Collection;
+import java.util.Collections;
 
 @Configuration
 @Profile("!prod")
@@ -101,10 +107,23 @@ public class DemoSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
     {
-        httpSecurity.authorizeHttpRequests(configure->
+        httpSecurity
+                .cors(cors->cors.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public @Nullable CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration corsConfiguration=new CorsConfiguration();
+                        corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+                        corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                        corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+                        corsConfiguration.setAllowCredentials(true);
+                        corsConfiguration.setMaxAge(3600L);
+                        return corsConfiguration;
+                    }
+                }))
+                .authorizeHttpRequests(configure->
                 configure.requestMatchers("/").hasRole("admin")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
-                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards","/user").authenticated()
+                        .requestMatchers("/myAccount/**","/myBalance/**","/myLoans/**","/myCards/**","/user").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
 
