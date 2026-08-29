@@ -1,0 +1,3 @@
+Watch vedio inside understanding cors and csrf section in spring security master class by maiden class name "taste of cors errors"
+Go from header and choose any link and go back 
+

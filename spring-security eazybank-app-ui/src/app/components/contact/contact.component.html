@@ -44,7 +44,7 @@
             </div>
             <div class="twice">
               <input type="email" class="form-control" name="contactEmail" id="contactEmail" placeholder="Email"
-                required pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" [(ngModel)]="model.contactEmail"
+                required pattern="^[a-z0-9._\%+\-]+@[a-z0-9\-]+\.[a-z]{2,4}$" [(ngModel)]="model.contactEmail"
                 #contactEmail="ngModel">
               <span class="text-danger" *ngIf="(contactEmail.touched || contactForm.submitted) &&
                 contactEmail.errors?.['required']">Error : Email is required !</span>

@@ -2,6 +2,7 @@ package com.eazybytes.springsecsection1.security;
 
 import com.eazybytes.springsecsection1.exception.CustomAccessDeniedHandler;
 import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
+import com.eazybytes.springsecsection1.filter.CsrfCookieFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -133,10 +138,16 @@ public class ProdDemoSecurityConfig {
         httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(1).maxSessionsPreventsLogin(true));
 
 //        httpSecurity.sessionManagement(session->
-//                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//               session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        
-        httpSecurity.csrf(csrf -> csrf.disable());
+        //if we comment it out it means its enabled
+        //httpSecurity.csrf(csrf->csrf.disable());
+        httpSecurity.csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        //.ignoringRequestMatchers( "/contact","/register")
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+        )
+                     .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
