@@ -1,7 +1,10 @@
 package com.eazybytes.springsecsection1.security;
 
 import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
+import com.eazybytes.springsecsection1.filter.AuthoritiesLoggingAfterFilter;
+import com.eazybytes.springsecsection1.filter.AuthoritiesLoggingAtFilter;
 import com.eazybytes.springsecsection1.filter.CsrfCookieFilter;
+import com.eazybytes.springsecsection1.filter.RequestValidationBeforeFilter;
 import com.eazybytes.springsecsection1.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
@@ -152,6 +155,10 @@ public class DemoSecurityConfig {
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
         )
                     .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
+
+        httpSecurity.addFilterAt(new AuthoritiesLoggingAtFilter(),BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(),BasicAuthenticationFilter.class)
+                .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class);
 
 
         return httpSecurity.build();
