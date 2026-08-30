@@ -128,10 +128,10 @@ public class DemoSecurityConfig {
                 .authorizeHttpRequests(configure->
                 configure.requestMatchers("/").hasRole("admin")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
-                        .requestMatchers("/myAccount/**").hasRole("VIEWACCOUNT")
-                        .requestMatchers("/myBalance/**").hasAnyRole("VIEWACCOUNT","VIEWBALANCE")
-                        .requestMatchers("/myLoans/**").hasRole("VIEWLOANS")
-                        .requestMatchers("/myCards/**").hasRole("VIEWCARDS")
+                        .requestMatchers("/myAccount/**").hasRole("USER")
+                        .requestMatchers("/myBalance/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/myLoans/**").hasRole("USER")
+                        .requestMatchers("/myCards/**").hasRole("USER")
                         .requestMatchers("/user").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );

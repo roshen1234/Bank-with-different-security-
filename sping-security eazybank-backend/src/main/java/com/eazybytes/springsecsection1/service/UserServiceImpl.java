@@ -61,8 +61,7 @@ public class UserServiceImpl implements UserService{
         finalUser.setDate(new Date());
         finalUser.setPassword(passwordEncoder.encode(user.getPassword()));
         finalUser.setRoles(Arrays.asList(
-                roleDOA.findRoleByName("VIEWACCOUNT"),
-                roleDOA.findRoleByName("VIEWBALANCE")
+                roleDOA.findRoleByName("ROLE_USER")
         ));
 
         User theUser=userDAO.save(finalUser);

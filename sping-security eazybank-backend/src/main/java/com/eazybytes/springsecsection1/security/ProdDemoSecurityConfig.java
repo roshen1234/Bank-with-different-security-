@@ -113,12 +113,12 @@ public class ProdDemoSecurityConfig {
                     }
                 }))
                 .authorizeHttpRequests(configure->
-                configure.requestMatchers("/").hasAuthority("ADMIN")
-                        .requestMatchers("/employee").hasAuthority("EMPLOYEE")
-                        .requestMatchers("/myAccount/**").hasAuthority("VIEWACCOUNT")
-                        .requestMatchers("/myBalance/**").hasAnyAuthority("VIEWACCOUNT","VIEWBALANCE")
-                        .requestMatchers("/myLoans/**").hasAuthority("VIEWLOANS")
-                        .requestMatchers("/myCards/**").hasAuthority("VIEWCARDS")
+                configure.requestMatchers("/").hasRole("ADMIN")
+                        .requestMatchers("/employee").hasRole("EMPLOYEE")
+                        .requestMatchers("/myAccount/**").hasRole("USER")
+                        .requestMatchers("/myBalance/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/myLoans/**").hasRole("USER")
+                        .requestMatchers("/myCards/**").hasRole("USER")
                         .requestMatchers("/user").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
