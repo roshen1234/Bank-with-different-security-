@@ -60,7 +60,10 @@ public class UserServiceImpl implements UserService{
         finalUser.setMobileNumber(user.getMobileNumber());
         finalUser.setDate(new Date());
         finalUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        finalUser.setRoles(Arrays.asList(roleDOA.findRoleByName("admin")));
+        finalUser.setRoles(Arrays.asList(
+                roleDOA.findRoleByName("VIEWACCOUNT"),
+                roleDOA.findRoleByName("VIEWBALANCE")
+        ));
 
         User theUser=userDAO.save(finalUser);
 

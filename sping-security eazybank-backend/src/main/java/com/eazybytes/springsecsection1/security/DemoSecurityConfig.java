@@ -128,14 +128,18 @@ public class DemoSecurityConfig {
                 .authorizeHttpRequests(configure->
                 configure.requestMatchers("/").hasRole("admin")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
-                        .requestMatchers("/myAccount/**","/myBalance/**","/myLoans/**","/myCards/**","/user").authenticated()
+                        .requestMatchers("/myAccount/**").hasRole("VIEWACCOUNT")
+                        .requestMatchers("/myBalance/**").hasAnyRole("VIEWACCOUNT","VIEWBALANCE")
+                        .requestMatchers("/myLoans/**").hasRole("VIEWLOANS")
+                        .requestMatchers("/myCards/**").hasRole("VIEWCARDS")
+                        .requestMatchers("/user").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
 
         httpSecurity.httpBasic(Customizer.withDefaults());
 
         httpSecurity.formLogin(Customizer.withDefaults());
-        //httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
+        httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
 
 //        httpSecurity.sessionManagement(session->
 //                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

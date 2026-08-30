@@ -9,6 +9,7 @@ import { User } from 'src/app/model/user.model';
 export class DashboardComponent implements OnInit {
 
   user = new User();
+  roleNames: string = '';
 
   constructor() {
     
@@ -17,6 +18,9 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     if(sessionStorage.getItem('userdetails')){
       this.user = JSON.parse(sessionStorage.getItem('userdetails') || "");
+       if (this.user.roles && this.user.roles.length > 0) {
+        this.roleNames = this.user.roles.map(r => r.name).join(', ');
+      }
     }
   }
 

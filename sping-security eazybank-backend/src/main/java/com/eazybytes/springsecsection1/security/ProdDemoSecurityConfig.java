@@ -113,9 +113,13 @@ public class ProdDemoSecurityConfig {
                     }
                 }))
                 .authorizeHttpRequests(configure->
-                configure.requestMatchers("/").hasRole("ADMIN")
-                        .requestMatchers("/employee").hasRole("EMPLOYEE")
-                        .requestMatchers("/myAccount/**","/myBalance/**","/myLoans/**","/myCards/**","/user").authenticated()
+                configure.requestMatchers("/").hasAuthority("ADMIN")
+                        .requestMatchers("/employee").hasAuthority("EMPLOYEE")
+                        .requestMatchers("/myAccount/**").hasAuthority("VIEWACCOUNT")
+                        .requestMatchers("/myBalance/**").hasAnyAuthority("VIEWACCOUNT","VIEWBALANCE")
+                        .requestMatchers("/myLoans/**").hasAuthority("VIEWLOANS")
+                        .requestMatchers("/myCards/**").hasAuthority("VIEWCARDS")
+                        .requestMatchers("/user").authenticated()
                         .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
         );
 
@@ -135,7 +139,7 @@ public class ProdDemoSecurityConfig {
 
         //to redirect to this page if session expires. How long session should stay before expiration is given in application property file
         //Also we can set the limit of session we can create (by default unlimited) and also if session creation reached limit keep already active alive and reject those are going to be created
-        httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(1).maxSessionsPreventsLogin(true));
+        httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
 
 //        httpSecurity.sessionManagement(session->
 //               session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -144,7 +148,7 @@ public class ProdDemoSecurityConfig {
         //httpSecurity.csrf(csrf->csrf.disable());
         httpSecurity.csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        //.ignoringRequestMatchers( "/contact","/register")
+                        .ignoringRequestMatchers( "/contact","/register")
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
         )
                      .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
