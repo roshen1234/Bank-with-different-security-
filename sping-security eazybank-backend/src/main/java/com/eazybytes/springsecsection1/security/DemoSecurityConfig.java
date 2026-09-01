@@ -1,10 +1,7 @@
 package com.eazybytes.springsecsection1.security;
 
 import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
-import com.eazybytes.springsecsection1.filter.AuthoritiesLoggingAfterFilter;
-import com.eazybytes.springsecsection1.filter.AuthoritiesLoggingAtFilter;
-import com.eazybytes.springsecsection1.filter.CsrfCookieFilter;
-import com.eazybytes.springsecsection1.filter.RequestValidationBeforeFilter;
+import com.eazybytes.springsecsection1.filter.*;
 import com.eazybytes.springsecsection1.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
@@ -34,6 +31,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
 import javax.xml.crypto.Data;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -122,6 +120,7 @@ public class DemoSecurityConfig {
                         CorsConfiguration corsConfiguration=new CorsConfiguration();
                         corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization"));
                         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
                         corsConfiguration.setAllowCredentials(true);
                         corsConfiguration.setMaxAge(3600L);
@@ -142,10 +141,10 @@ public class DemoSecurityConfig {
         httpSecurity.httpBasic(Customizer.withDefaults());
 
         httpSecurity.formLogin(Customizer.withDefaults());
-        httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
+        //httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
 
-//        httpSecurity.sessionManagement(session->
-//                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        httpSecurity.sessionManagement(session->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 
         //httpSecurity.csrf(csrf->csrf.disable());
@@ -158,7 +157,9 @@ public class DemoSecurityConfig {
 
         httpSecurity.addFilterAt(new AuthoritiesLoggingAtFilter(),BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(),BasicAuthenticationFilter.class)
-                .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class);
+                .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(),BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidatorFilter(),BasicAuthenticationFilter.class);
 
 
         return httpSecurity.build();

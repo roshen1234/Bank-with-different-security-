@@ -2,10 +2,7 @@ package com.eazybytes.springsecsection1.security;
 
 import com.eazybytes.springsecsection1.exception.CustomAccessDeniedHandler;
 import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
-import com.eazybytes.springsecsection1.filter.AuthoritiesLoggingAfterFilter;
-import com.eazybytes.springsecsection1.filter.AuthoritiesLoggingAtFilter;
-import com.eazybytes.springsecsection1.filter.CsrfCookieFilter;
-import com.eazybytes.springsecsection1.filter.RequestValidationBeforeFilter;
+import com.eazybytes.springsecsection1.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,6 +21,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -109,6 +108,7 @@ public class ProdDemoSecurityConfig {
                         CorsConfiguration corsConfiguration=new CorsConfiguration();
                         corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization"));
                         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
                         corsConfiguration.setAllowCredentials(true);
                         corsConfiguration.setMaxAge(3600L);
@@ -142,10 +142,10 @@ public class ProdDemoSecurityConfig {
 
         //to redirect to this page if session expires. How long session should stay before expiration is given in application property file
         //Also we can set the limit of session we can create (by default unlimited) and also if session creation reached limit keep already active alive and reject those are going to be created
-        httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
+       // httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
 
-//        httpSecurity.sessionManagement(session->
-//               session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        httpSecurity.sessionManagement(session->
+               session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         //if we comment it out it means its enabled
         //httpSecurity.csrf(csrf->csrf.disable());
@@ -158,7 +158,9 @@ public class ProdDemoSecurityConfig {
 
         httpSecurity.addFilterAt(new AuthoritiesLoggingAtFilter(),BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(),BasicAuthenticationFilter.class)
-                .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class);
+                .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(),BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidatorFilter(),BasicAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
