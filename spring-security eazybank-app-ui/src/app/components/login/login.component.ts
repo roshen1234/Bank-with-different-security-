@@ -26,9 +26,11 @@ validateUser(loginForm: NgForm) {
     const plainPassword = this.model.password; // capture the real plaintext password BEFORE it gets overwritten
 
     this.loginService.validateLoginDetails(this.model).subscribe(
-      responseData => {
+      responseData => {    
+        sessionStorage.setItem("Authorization",responseData.headers.get("Authorization")!);
         this.model = <any> responseData.body;
-        this.model.password = plainPassword; // restore the correct plaintext password into the new model
+        // this.model.password = plainPassword; // restore the correct plaintext password into the new model
+        this.model.password=""; // clear the password for security reasons for jwt to run the else block in interceptor
         this.model.authStatus = 'AUTH';
         window.sessionStorage.setItem("userdetails", JSON.stringify(this.model));
         let csrf = getCookie("XSRF-TOKEN");
