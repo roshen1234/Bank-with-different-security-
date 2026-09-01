@@ -8,6 +8,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.Customizer;
@@ -15,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -109,6 +112,14 @@ public class DemoSecurityConfig {
 //        return auth;
 //    }
 
+    @Bean
+    public AuthenticationManager authenticationManager(UserService userService,PasswordEncoder passwordEncoder)
+    {
+        UserNamePwdAuthenticationProvider userNamePwdAuthenticationProvider=new UserNamePwdAuthenticationProvider(userService,passwordEncoder);
+        ProviderManager providerManager = new ProviderManager(userNamePwdAuthenticationProvider);
+        providerManager.setEraseCredentialsAfterAuthentication(false);
+        return  providerManager;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
@@ -135,7 +146,7 @@ public class DemoSecurityConfig {
                         .requestMatchers("/myLoans/**").hasRole("USER")
                         .requestMatchers("/myCards/**").hasRole("USER")
                         .requestMatchers("/user").authenticated()
-                        .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
+                        .requestMatchers("/notices","/contact","/error","/register","/invalidSession","/apiLogin").permitAll()
         );
 
         httpSecurity.httpBasic(Customizer.withDefaults());

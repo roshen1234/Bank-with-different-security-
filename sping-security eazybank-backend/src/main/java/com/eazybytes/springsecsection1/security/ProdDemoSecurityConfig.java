@@ -3,11 +3,14 @@ package com.eazybytes.springsecsection1.security;
 import com.eazybytes.springsecsection1.exception.CustomAccessDeniedHandler;
 import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
 import com.eazybytes.springsecsection1.filter.*;
+import com.eazybytes.springsecsection1.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -98,6 +101,14 @@ public class ProdDemoSecurityConfig {
 //        return auth;
 //    }
 
+    @Bean
+    public AuthenticationManager authenticationManager(UserService userService, PasswordEncoder passwordEncoder)
+    {
+        ProdUserNamePwdAuthenticationProvider userNamePwdAuthenticationProvider=new ProdUserNamePwdAuthenticationProvider(userService,passwordEncoder);
+        ProviderManager providerManager = new ProviderManager(userNamePwdAuthenticationProvider);
+        providerManager.setEraseCredentialsAfterAuthentication(false);
+        return  providerManager;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
@@ -123,7 +134,7 @@ public class ProdDemoSecurityConfig {
                         .requestMatchers("/myLoans/**").hasRole("USER")
                         .requestMatchers("/myCards/**").hasRole("USER")
                         .requestMatchers("/user").authenticated()
-                        .requestMatchers("/notices","/contact","/error","/register","/invalidSession").permitAll()
+                        .requestMatchers("/notices","/contact","/error","/register","/invalidSession","/apiLogin").permitAll()
         );
 
         //this is to make every call https and not http the default port of https is 8443
