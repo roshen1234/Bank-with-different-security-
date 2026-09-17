@@ -5,13 +5,18 @@ import com.eazybytes.springsecsection1.filter.*;
 import com.eazybytes.springsecsection1.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.authorization.AuthorizationEventPublisher;
+import org.springframework.security.authorization.SpringAuthorizationEventPublisher;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -119,6 +124,20 @@ public class DemoSecurityConfig {
         ProviderManager providerManager = new ProviderManager(userNamePwdAuthenticationProvider);
         providerManager.setEraseCredentialsAfterAuthentication(false);
         return  providerManager;
+    }
+
+    @Bean
+    public AuthenticationEventPublisher authenticationEventPublisher(
+            ApplicationEventPublisher applicationEventPublisher) {
+
+        return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+    }
+
+    @Bean
+    public AuthorizationEventPublisher authorizationEventPublisher(
+            ApplicationEventPublisher applicationEventPublisher) {
+
+        return new SpringAuthorizationEventPublisher(applicationEventPublisher);
     }
 
     @Bean
