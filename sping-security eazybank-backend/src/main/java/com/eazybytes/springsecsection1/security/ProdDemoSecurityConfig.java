@@ -150,7 +150,7 @@ public class ProdDemoSecurityConfig {
                 .authorizeHttpRequests(configure->
                 configure.requestMatchers("/").hasRole("ADMIN")
                         .requestMatchers("/employee").hasRole("EMPLOYEE")
-                        .requestMatchers("/myAccount/**").hasRole("USERKING")
+                        .requestMatchers("/myAccount/**").hasRole("USER")
                         .requestMatchers("/myBalance/**").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/myLoans/**").authenticated()//we do method level authorization
                         .requestMatchers("/myCards/**").hasRole("USER")
