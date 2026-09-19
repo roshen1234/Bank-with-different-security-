@@ -1,26 +1,21 @@
 package com.eazybytes.springsecsection1.security;
 
-import com.eazybytes.springsecsection1.controller.KeycloakRoleConverter;
 import com.eazybytes.springsecsection1.exception.CustomAccessDeniedHandler;
-import com.eazybytes.springsecsection1.exception.CustomBasicAuthenticationEntryPoint;
 import com.eazybytes.springsecsection1.filter.*;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authorization.AuthorizationEventPublisher;
 import org.springframework.security.authorization.SpringAuthorizationEventPublisher;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -35,6 +30,10 @@ import java.util.Collections;
 @Configuration
 @Profile("prod")
 public class ProdDemoSecurityConfig {
+
+    public ProdDemoSecurityConfig() {
+        System.out.println(">>> ProdDemoSecurityConfig CONSTRUCTOR CALLED <<<");
+    }
 
 //    @Bean
 //    public InMemoryUserDetailsManager userDetailsManager() {
@@ -110,12 +109,27 @@ public class ProdDemoSecurityConfig {
         return new SpringAuthorizationEventPublisher(applicationEventPublisher);
     }
 
+    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
+    String introspectionUri;
+
+    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-id}")
+    String clientId;
+
+    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-secret}")
+    String clientSecret;
+
+    @PostConstruct
+    public void debugPrint() {
+        System.out.println("RESOLVED CLIENT ID: [" + clientId + "]");
+        System.out.println("RESOLVED SECRET (last 4): ..." + clientSecret.substring(clientSecret.length() - 4));
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
     {
         //to get roles from keycloak as Granted Authorities
-        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
+//        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
+//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
 
         httpSecurity.cors(cors->cors.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -144,8 +158,12 @@ public class ProdDemoSecurityConfig {
         //this is to make every call https and not http the default port of https is 8443
 //        httpSecurity.redirectToHttps(Customizer.withDefaults());
 
-        //making this resourse server
-         httpSecurity.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+        //making this backend as resourse server with jwt token
+//         httpSecurity.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+
+        //making this backend as resourse server with opaque token
+        httpSecurity.oauth2ResourceServer(rsc -> rsc.opaqueToken(otc -> otc.authenticationConverter(new KeycloakOpaqueRoleConverter())
+                .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId,this.clientSecret)));
 
         //access denied handler we can only mention globaly not in httpBasic
         httpSecurity.exceptionHandling(exception->exception.accessDeniedHandler(new CustomAccessDeniedHandler()));

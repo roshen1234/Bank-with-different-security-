@@ -1,4 +1,4 @@
-package com.eazybytes.springsecsection1.controller;
+package com.eazybytes.springsecsection1.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
