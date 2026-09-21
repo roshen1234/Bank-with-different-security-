@@ -102,21 +102,21 @@ public class DemoSecurityConfig {
     }
 
 
-    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
-    String introspectionUri;
-
-    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-id}")
-    String clientId;
-
-    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-secret}")
-    String clientSecret;
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
+//    String introspectionUri;
+//
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-id}")
+//    String clientId;
+//
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-secret}")
+//    String clientSecret;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
     {
 
-//        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
-//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
+        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
 
         httpSecurity
                 .cors(cors->cors.configurationSource(new CorsConfigurationSource() {
@@ -143,10 +143,10 @@ public class DemoSecurityConfig {
                         .requestMatchers("/notices","/contact","/error","/register").permitAll()
         );
 
-        //httpSecurity.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+        httpSecurity.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
 
-        httpSecurity.oauth2ResourceServer(rsc -> rsc.opaqueToken(otc -> otc.authenticationConverter(new KeycloakOpaqueRoleConverter())
-                .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId,this.clientSecret)));
+//        httpSecurity.oauth2ResourceServer(rsc -> rsc.opaqueToken(otc -> otc.authenticationConverter(new KeycloakOpaqueRoleConverter())
+//                .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId,this.clientSecret)));
 
         //httpSecurity.sessionManagement(session->session.invalidSessionUrl("/invalidSession").maximumSessions(3).maxSessionsPreventsLogin(true));
 

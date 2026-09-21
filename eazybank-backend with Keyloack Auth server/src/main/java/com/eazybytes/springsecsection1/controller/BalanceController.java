@@ -20,9 +20,9 @@ public class BalanceController {
     private final UserDAO userDAO;
 
     @GetMapping("/myBalance")
-    public List<AccountTransactions> getBalanceDetails(@RequestParam String userName) {
+    public List<AccountTransactions> getBalanceDetails(@RequestParam String email) {
 
-        User user=userDAO.findUserByUsername(userName);
+        User user=userDAO.findUserByUsername(email);
 
         if(user!=null) {
             List<AccountTransactions> accountTransactions = accountTransactionsRepository.

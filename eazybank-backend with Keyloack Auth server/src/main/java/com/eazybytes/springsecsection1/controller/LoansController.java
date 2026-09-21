@@ -21,8 +21,8 @@ public class LoansController {
 
     @GetMapping("/myLoans")
     @PreAuthorize("hasRole('USER')")
-    public List<Loans> getLoanDetails(@RequestParam  String userName) {
-        User user=userDAO.findUserByUsername(userName);
+    public List<Loans> getLoanDetails(@RequestParam  String email) {
+        User user=userDAO.findUserByUsername(email);
         if(user!=null) {
             List<Loans> loans = loanRepository.findByCustomerIdOrderByStartDtDesc(user.getId());
             if (loans != null) {

@@ -109,27 +109,27 @@ public class ProdDemoSecurityConfig {
         return new SpringAuthorizationEventPublisher(applicationEventPublisher);
     }
 
-    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
-    String introspectionUri;
-
-    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-id}")
-    String clientId;
-
-    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-secret}")
-    String clientSecret;
-
-    @PostConstruct
-    public void debugPrint() {
-        System.out.println("RESOLVED CLIENT ID: [" + clientId + "]");
-        System.out.println("RESOLVED SECRET (last 4): ..." + clientSecret.substring(clientSecret.length() - 4));
-    }
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
+//    String introspectionUri;
+//
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-id}")
+//    String clientId;
+//
+//    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-secret}")
+//    String clientSecret;
+//
+//    @PostConstruct
+//    public void debugPrint() {
+//        System.out.println("RESOLVED CLIENT ID: [" + clientId + "]");
+//        System.out.println("RESOLVED SECRET (last 4): ..." + clientSecret.substring(clientSecret.length() - 4));
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)
     {
         //to get roles from keycloak as Granted Authorities
-//        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
-//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
+        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
 
         httpSecurity.cors(cors->cors.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -159,11 +159,11 @@ public class ProdDemoSecurityConfig {
 //        httpSecurity.redirectToHttps(Customizer.withDefaults());
 
         //making this backend as resourse server with jwt token
-//         httpSecurity.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+         httpSecurity.oauth2ResourceServer(rsc->rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
 
         //making this backend as resourse server with opaque token
-        httpSecurity.oauth2ResourceServer(rsc -> rsc.opaqueToken(otc -> otc.authenticationConverter(new KeycloakOpaqueRoleConverter())
-                .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId,this.clientSecret)));
+//        httpSecurity.oauth2ResourceServer(rsc -> rsc.opaqueToken(otc -> otc.authenticationConverter(new KeycloakOpaqueRoleConverter())
+//                .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId,this.clientSecret)));
 
         //access denied handler we can only mention globaly not in httpBasic
         httpSecurity.exceptionHandling(exception->exception.accessDeniedHandler(new CustomAccessDeniedHandler()));

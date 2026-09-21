@@ -19,8 +19,8 @@ public class CardsController {
     private final UserDAO userDAO;
 
     @GetMapping("/myCards")
-    public List<Cards> getCardDetails(@RequestParam String userName) {
-        User user=userDAO.findUserByUsername(userName);
+    public List<Cards> getCardDetails(@RequestParam String email) {
+        User user=userDAO.findUserByUsername(email);
 
         if(user!=null) {
             List<Cards> cards = cardsRepository.findByCustomerId(user.getId());

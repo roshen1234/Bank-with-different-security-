@@ -19,8 +19,8 @@ public class AccountController {
     private final AccountsRepository accountsRepository;
     private final UserDAO userDAO;
     @GetMapping("/myAccount")
-    public Accounts getAccountDetails(@RequestParam String userName) {
-        User user=userDAO.findUserByUsername(userName);
+    public Accounts getAccountDetails(@RequestParam String email) {
+        User user=userDAO.findUserByUsername(email);
         if(user!=null)
         {
             Accounts accounts = accountsRepository.findByCustomerId(user.getId());
