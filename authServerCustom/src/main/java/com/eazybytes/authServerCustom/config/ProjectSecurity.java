@@ -195,6 +195,28 @@ public class ProjectSecurity {
                         // Finishes the RegisteredClient configuration.
                         .build();
 
+        RegisteredClient introspectClient =
+                RegisteredClient.withId(UUID.randomUUID().toString())
+                        .clientId("EazyBankIntrospect(Opaque)")
+                        .clientSecret("{noop}PutANewRandomSecretOfAround40CharsHere")
+                        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                        .scopes(scopeConfig ->
+                                scopeConfig.addAll(
+                                        List.of(OidcScopes.OPENID, "ADMIN", "USER"))
+                        )
+                        .tokenSettings(
+                                TokenSettings.builder()
+                                        .accessTokenTimeToLive(
+                                                Duration.ofMinutes(10)
+                                        )
+                                        .accessTokenFormat(
+                                                OAuth2TokenFormat.REFERENCE
+                                        )
+                                        .build()
+                        )
+                        .build();
+
         RegisteredClient authCodeClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("eazybankclient")
                 .clientSecret("{noop}Qw3rTy6UjMnB9zXcV2pL0sKjHn5TxQqB")
@@ -227,7 +249,7 @@ public class ProjectSecurity {
 
 
         // Stores the registered client in memory instead of a database.
-        return new InMemoryRegisteredClientRepository(clientCredClient,authCodeClient,pkceClient);
+        return new InMemoryRegisteredClientRepository(clientCredClient,introspectClient,authCodeClient,pkceClient);
     }
 
 
