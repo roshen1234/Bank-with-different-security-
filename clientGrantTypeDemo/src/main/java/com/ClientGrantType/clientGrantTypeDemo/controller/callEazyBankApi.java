@@ -26,6 +26,4 @@ public class callEazyBankApi {
                 .body(Account.class);
     }
 
-
-
 }
